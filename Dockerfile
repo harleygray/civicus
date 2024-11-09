@@ -1,8 +1,11 @@
-# Multi-stage build for production
-FROM elixir:1.17.3-otp-27 AS build
+# Build stage
+FROM elixir:1.17.3-otp-27 AS builder
 
 # Install build dependencies
-RUN apk add --no-cache build-base git nodejs npm
+RUN apt-get update -y && \
+    apt-get install -y build-essential git nodejs npm && \
+    apt-get clean && \
+    rm -f /var/lib/apt/lists/*_*
 
 WORKDIR /app
 
@@ -26,23 +29,29 @@ COPY priv priv
 RUN cd assets && npm install && npm run deploy
 RUN mix phx.digest
 
-# Compile the release
+# Compile and release
 COPY lib lib
 RUN mix compile
 RUN mix release
 
-# Generate the release image
-FROM alpine:3.18.4 AS app
+# Runtime stage
+FROM debian:bullseye-slim
 
-RUN apk add --no-cache libstdc++ openssl ncurses-libs
+RUN apt-get update -y && \
+    apt-get install -y libstdc++6 openssl libncurses6 && \
+    apt-get clean && \
+    rm -f /var/lib/apt/lists/*_*
 
 WORKDIR /app
 
 # Copy the release from build stage
-COPY --from=build /app/_build/prod/rel/your_app_name ./
+COPY --from=builder /app/_build/prod/rel/civicus ./
 
-# Set environment variables
 ENV HOME=/app
-ENV PORT=4000
+ENV PORT=80
+ENV PHX_HOST=0.0.0.0
 
-CMD ["bin/your_app_name", "start"]
+# Verbose logging
+ENV ELIXIR_ERL_OPTIONS="+S 1:1 +P 134217727 +K true +A 64 +sbwt very_long +swt very_long +scl false +sub true +spp true +sct true +sbt db +swt very_long +scl false +sub true +spp true +sct true +sbt db"
+
+CMD ["bin/civicus", "start"]
