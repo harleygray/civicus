@@ -3,10 +3,19 @@
   "version": "1.0.0",
   "main": "tailwind.config.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "deploy": "node esbuild.config.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": ""
+  "description": "",
+  "devDependencies": {
+    "esbuild": "^0.24.0"
+  },
+  "dependencies": {
+    "phoenix": "^1.7.14",
+    "phoenix_html": "^3.3.4",
+    "phoenix_live_view": "^1.0.0-rc.7"
+  }
 }
