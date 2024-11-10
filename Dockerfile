@@ -5,7 +5,7 @@ FROM elixir:1.17.3-otp-27 AS builder
 RUN apt-get update -y && \
     apt-get install -y build-essential git nodejs npm && \
     apt-get clean && \
-    rm -f /var/lib/apt/lists/*_*
+    rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
