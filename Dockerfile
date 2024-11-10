@@ -35,7 +35,7 @@ RUN mix compile
 RUN mix release
 
 # Runtime stage
-FROM debian:bullseye-slim
+FROM debian:bullseye
 
 RUN apt-get update -y && \
     apt-get install -y libstdc++6 openssl libncurses6 && \
