@@ -1,0 +1,35 @@
+<.live_component module={HeaderNav} id="header_nav" />
+<div class="container mx-auto px-4 py-8">
+  <div class="max-w-3xl mx-auto">
+    <h1 class="article-title"><%= @article.title %></h1>
+    <%= if @article.published_at do %>
+      <p class="date-published">Published on <%= Date.to_string(@article.published_at) %></p>
+    <% end %>
+    <div class="article-content">
+      <%= raw(render_markdown(@article.content)) %>
+    </div>
+    <div class="mt-8 flex justify-between items-center">
+      <%= if @prev_article_slug do %>
+        <button
+          phx-click="navigate"
+          phx-value-to="prev"
+          class="px-4 py-2 bg-blue-500 text-white rounded"
+        >
+          Previous Article
+        </button>
+      <% end %>
+      <.link navigate={~p"/articles"} class="text-blue-500 hover:text-blue-700">
+        Back to Articles
+      </.link>
+      <%= if @next_article_slug do %>
+        <button
+          phx-click="navigate"
+          phx-value-to="next"
+          class="px-4 py-2 bg-blue-500 text-white rounded"
+        >
+          Next Article
+        </button>
+      <% end %>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,28 @@
+<body>
+  <.live_component module={HeaderNav} id="header_nav" />
+
+  <div class="padding-container">
+    <h2 class="heading-text">Articles</h2>
+    <p class="cta-text">
+      This is where I become a journalist
+    </p>
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <%= for post <- @posts do %>
+        <div class="post-card bg-white shadow-md rounded-lg p-4">
+          <h2 class="text-xl font-semibold"><%= post.title %></h2>
+          <p class="text-gray-700 mt-2"><%= post.excerpt %></p>
+          <p class="text-sm text-gray-500 mt-2">
+            <%= if post.published_at do %>
+              Published: <%= Date.to_string(post.published_at) %>
+            <% else %>
+              Not published
+            <% end %>
+          </p>
+          <.link navigate={"/articles/#{post.slug}"} class="text-blue-500 mt-4 inline-block">
+            Read More
+          </.link>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</body>

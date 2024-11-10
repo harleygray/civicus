@@ -1,0 +1,28 @@
+<body>
+  <!--Header-->
+  <.live_component module={HeaderNav} id="header_nav" />
+  <!--Hero-->
+  <.hero />
+  <.live_component
+    module={CivicusWeb.Components.MailingListComponent}
+    id="mailing-list-subscribe"
+  />
+  <!--Footer-->
+  <.footer />
+  <script>
+    var header = document.getElementById("header");
+    var civicusLink = document.getElementById("nav-civicus");
+
+    document.addEventListener("scroll", function () {
+        var scrollpos = window.scrollY;
+
+        if (scrollpos > 10) {
+            header.classList.add("scrolled");
+            civicusLink.classList.add("scrolled");
+        } else {
+            header.classList.remove("scrolled");
+            civicusLink.classList.remove("scrolled");
+        }
+    });
+  </script>
+</body>

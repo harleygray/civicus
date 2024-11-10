@@ -12,8 +12,18 @@ defmodule CivicusWeb.Endpoint do
   ]
 
   socket "/live", Phoenix.LiveView.Socket,
-    websocket: [connect_info: [session: @session_options]],
-    longpoll: [connect_info: [session: @session_options]]
+    websocket: [
+      connect_info: [:x_headers, :peer_data, :uri, session: @session_options],
+      logger: {CivicusWeb.Endpoint, :log_socket_connect, []}
+    ],
+    longpoll: [
+      connect_info: [:x_headers, :peer_data, :uri, session: @session_options],
+      logger: {CivicusWeb.Endpoint, :log_socket_connect, []}
+    ]
+
+  def log_socket_connect(conn) do
+    IO.puts("WebSocket connection attempt: #{inspect(conn)}")
+  end
 
   # Serve at "/" the static files from "priv/static" directory.
   #
@@ -23,7 +33,9 @@ defmodule CivicusWeb.Endpoint do
     at: "/",
     from: :civicus,
     gzip: false,
-    only: CivicusWeb.static_paths()
+    only:
+      CivicusWeb.static_paths() ++
+        ~w(css fonts assets images js lib svg icons bill_article json)
 
   # Code reloading can be explicitly enabled under the
   # :code_reloader configuration of your endpoint.

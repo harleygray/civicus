@@ -1,0 +1,57 @@
+<body>
+  <.live_component module={HeaderNav} id="header_nav" />
+
+  <div class="article-container">
+    <.header>
+      Articles
+      <:actions>
+        <button phx-click="new_article" class="button-gradient">
+          New Article
+        </button>
+      </:actions>
+    </.header>
+    <%= if @show_form do %>
+      <.form
+        :let={f}
+        for={@changeset}
+        id="article-form"
+        phx-submit="save"
+        class="new-article-form"
+      >
+        <.input field={f[:title]} type="text" label="Title" />
+        <.input field={f[:slug]} type="text" label="Slug" />
+        <.input field={f[:content]} type="textarea" label="Content" />
+        <.input field={f[:excerpt]} type="textarea" label="Excerpt" />
+        <.input field={f[:published_at]} type="date" label="Published At" />
+
+        <div class="form-actions">
+          <.button phx-disable-with="Saving...">Save Article</.button>
+          <.button type="button" phx-click="cancel" class="cancel-button">Cancel</.button>
+        </div>
+      </.form>
+    <% end %>
+
+    <div class="article-grid">
+      <%= for article <- @articles do %>
+        <div class="article-card" phx-click="edit_article" phx-value-id={article.id}>
+          <h2 class="article-title"><%= article.title %></h2>
+          <div class="article-meta">
+            <p>Slug: <%= article.slug %></p>
+            <p>
+              Published:
+              <%= if article.published_at do %>
+                <%= Date.to_string(article.published_at) %>
+              <% else %>
+                Not published
+              <% end %>
+            </p>
+          </div>
+          <div class="article-content">
+            <p><%= String.slice(article.content || "", 0, 100) %>...</p>
+            <p>Excerpt: <%= article.excerpt %></p>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</body>

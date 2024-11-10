@@ -4,12 +4,31 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="csrf-token" content={get_csrf_token()} />
-    <.live_title suffix=" · Phoenix Framework">
+    <.live_title>
       <%= assigns[:page_title] || "Civicus" %>
     </.live_title>
     <link phx-track-static rel="stylesheet" href={~p"/assets/app.css"} />
     <script defer phx-track-static type="text/javascript" src={~p"/assets/app.js"}>
     </script>
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png" />
+    <link rel="manifest" href="/icons/manifest.json" />
+    <link rel="mask-icon" href="/icons/safari-pinned-tab.svg" color="#5bbad5" />
+    <meta name="msapplication-TileColor" content="#da532c" />
+    <meta name="theme-color" content="#ffffff" />
+
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:creator" content="@harleyraygray" />
+
+    <meta property="og:url" content="https://civicus.fyi/" />
+    <meta property="og:title" content={assigns[:page_title] || "Civicus"} />
+    <meta
+      property="og:description"
+      content={
+        assigns[:page_description] || "Independent civic journalism platform for Australia "
+      }
+    />
   </head>
   <body class="bg-white antialiased">
     <%= @inner_content %>

@@ -90,6 +90,9 @@ defmodule CivicusWeb do
       # Shortcut for generating JS commands
       alias Phoenix.LiveView.JS
 
+      # Header Nav, Hero components
+      import CivicusWeb.Components.{HeaderNav, Hero, Footer}
+
       # Routes generation with the ~p sigil
       unquote(verified_routes())
     end
