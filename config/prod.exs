@@ -7,7 +7,7 @@ import Config
 # before starting your production server.
 config :civicus, CivicusWeb.Endpoint,
   cache_static_manifest: "priv/static/cache_manifest.json",
-  http: [port: System.get_env("PORT") || 80]
+  http: [port: {:system, "PORT"}]
 
 # Configures Swoosh API Client
 config :swoosh, api_client: Swoosh.ApiClient.Finch, finch_name: Civicus.Finch

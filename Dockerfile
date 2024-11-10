@@ -42,14 +42,19 @@ RUN apt-get update -y && \
     apt-get clean && \
     rm -f /var/lib/apt/lists/*_*
 
+ENV HOME=/app
+ENV PORT=80
+ENV PHX_HOST=0.0.0.0
+
+EXPOSE $PORT
+EXPOSE 443
+EXPOSE 8080
+
 WORKDIR /app
 
 # Copy the release from build stage
 COPY --from=builder /app/_build/prod/rel/civicus ./
 
-ENV HOME=/app
-ENV PORT=80
-ENV PHX_HOST=0.0.0.0
 
 # Verbose logging
 ENV ELIXIR_ERL_OPTIONS="+S 1:1 +P 134217727 +K true +A 64 +sbwt very_long +swt very_long +scl false +sub true +spp true +sct true +sbt db +swt very_long +scl false +sub true +spp true +sct true +sbt db"
