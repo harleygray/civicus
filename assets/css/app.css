@@ -2,4 +2,457 @@
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
 
+
+
 /* This file is for your main application CSS */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Source Sans Pro', sans-serif;
+    font-size: 16px;
+}
+
+
+
+/* Styles */
+c .button-gradient:hover {
+    background: linear-gradient(to bottom left, #0ea5e9, #1e40af);
+    transform: scale(1.05);
+    text-decoration: underline;
+}
+
+.button-gradient:active {
+    background: linear-gradient(to bottom left, #1e40af, #0ea5e9);
+    transform: scale(0.95);
+    text-decoration: underline;
+}
+
+.text-gradient-background {
+    background: linear-gradient(to bottom left, #1e40af, #0ea5e9);
+    color: white;
+    padding: 2px 4px;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+.gradient-text {
+    background: linear-gradient(to bottom left, #1e40af, #0ea5e9);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+h3 a,
+p a {
+    color: #1e40af;
+    /* Tailwind's blue-800 */
+    text-decoration: underline;
+}
+
+h3 a:hover,
+p a:hover {
+    color: #0ea5e9;
+    /* Tailwind's sky-500 */
+    text-decoration: none;
+}
+
+.heading-text {
+    background: linear-gradient(to right, #1e40af, #0ea5e9);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-size: 2.5rem;
+    font-weight: 600;
+    line-height: 1.2;
+    margin-top: 0.5rem;
+}
+
+
+/* Mobile Menu */
+@media (max-width: 767px) {
+    .nav-links {
+        flex-direction: column;
+    }
+
+    .nav-links .nav-link {
+        padding: 1rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        width: 100%;
+    }
+
+    .nav-links {
+        display: block;
+    }
+}
+
+/* Footer */
+.footer-container {
+    background-color: white;
+}
+
+.footer-inner {
+    width: 100%;
+    margin: 0 auto;
+    padding: 1rem 5vw;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.footer-logo-container {
+    flex: 1;
+    display: flex;
+    align-items: center;
+}
+
+.footer-logo-link {
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 2rem;
+    color: #1e40af;
+}
+
+.footer-social-icons {
+    display: flex;
+    gap: 1rem;
+}
+
+.social-link {
+    display: inline-block;
+}
+
+.social-icon {
+    width: 30px;
+    height: 30px;
+    transition: transform 0.3s ease;
+}
+
+.social-icon:hover {
+    transform: scale(1.1);
+}
+
+/* Redone Header */
+.header-nav {
+    position: relative;
+    width: 100%;
+    z-index: 30;
+    overflow: visible;
+    @apply bg-gradient-to-tr from-[#1e40af] to-[#0ea5e9] text-white;
+}
+
+.header-nav .header-content {
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 0.20rem 4.25vw;
+    z-index: 3;
+}
+
+.padding-container {
+    padding: 0.20rem 4.25vw;
+
+}
+
+.header-nav .logo-link {
+    position: relative;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 1.8rem;
+    color: white;
+}
+
+/* Nav Links */
+.nav-links {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+}
+
+.nav-link {
+    color: white;
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+
+.nav-links .nav-link:hover {
+    color: #0ea5e9;
+}
+
+.header-nav .logo {
+    margin: 0;
+    z-index: 2;
+}
+
+/* Mailing list component */
+.mailing-list-component {
+    width: 40%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 13vh;
+}
+
+@media (max-width: 767px) {
+    .mailing-list-component {
+        width: 75%;
+    }
+}
+
+.mailing-list-component h2 {
+    background: linear-gradient(to right, #1e40af, #0ea5e9);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-size: 1.8rem;
+    font-weight: 600;
+}
+
+.mailing-list-component .newsletter-form {
+    gap: 0.5rem;
+}
+
+.mailing-list-component .newsletter-form .input-email {
+
+    width: 70%;
+    border-radius: 0.25rem;
+    border: 2px solid #e5e7eb;
+    transition: border-color 0.3s ease-in-out;
+}
+
+.mailing-list-component .newsletter-form .submit-button {
+    width: 30%;
+    background: linear-gradient(to right, #1e40af, #0ea5e9);
+    color: white;
+    border: none;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    transition: opacity 0.3s ease-in-out;
+    white-space: nowrap;
+    align-self: stretch;
+    margin-bottom: 0;
+    margin-top: 0.5rem;
+}
+
+.mailing-list-component .newsletter-form .input-email::focus {
+    border-color: #0ea5e9;
+    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2);
+    outline: none;
+
+}
+
+.mailing-list-component .newsletter-form .submit-button::hover {
+    opacity: 0.9;
+}
+
+.mailing-list-component p {
+    animation: fadeIn 0.7s ease-in-out;
+    font-size: 1.3rem;
+}
+
+.cta-text {
+    font-size: 1.125rem;
+    line-height: 1.75rem;
+    margin-bottom: 10px;
+}
+
+.mailing-list-component .message {
+    margin-top: 0.5rem;
+    font-weight: 600;
+}
+
+/* Hero */
+.hero {
+    position: relative;
+    display: flex;
+    align-items: center;
+    overflow: visible;
+    padding-top: 0.3vw;
+    padding-left: 6vw;
+    padding-right: 6vw;
+    padding-bottom: 3vw;
+}
+
+.wave-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: -1;
+    height: 26vh;
+    object-fit: fill;
+}
+
+.hero-content {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 100%;
+    z-index: 1;
+}
+
+
+.hero-secondary {
+    flex: 0 1 auto;
+    text-align: center;
+    padding-left: 1.4rem;
+    padding-right: 1.4rem;
+}
+
+.hero-text {
+    text-align: center;
+    font-weight: bold;
+    color: white;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    padding-bottom: 0rem;
+}
+
+.hero-title {
+    font-size: 1.4rem;
+    margin-top: 0;
+}
+
+.hero-secondary blockquote {
+    margin: 0;
+    justify-content: center;
+    padding: 0;
+    color: white;
+    font-style: italic;
+    font-weight: 450;
+    font-size: 0.9rem;
+    margin-top: 0;
+}
+
+@media (min-width: 768px) {
+    .hero {
+        padding-top: 2vw;
+    }
+
+    .hero-text {
+        padding-bottom: 1rem;
+    }
+
+    .hero-content {
+        flex-direction: row;
+
+    }
+
+    .hero-title {
+        font-size: 2.4rem;
+        text-align: left;
+    }
+
+    .hero-secondary blockquote {
+        font-size: 1.7rem;
+        text-align: left;
+    }
+
+    .hero-secondary {
+        flex: 0 1 auto;
+        text-align: left;
+        padding: 1rem 0.5rem 0.5rem 4rem;
+    }
+
+}
+
+@media (min-width: 2000px) {
+    .hero-title {
+        font-size: 2.9rem;
+        text-align: left;
+    }
+
+    .hero-secondary blockquote {
+        font-size: 2.1rem;
+        text-align: left;
+    }
+}
+
+/* Articles */
+.date-published {
+    color: #6b7280;
+    font-size: 0.875rem;
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+}
+
+.article-title {
+    color: #1e40af;
+    font-size: 2rem;
+    font-weight: 700;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.19);
+    margin-top: 1.5rem;
+    margin-bottom: 0.1rem;
+}
+
+.article-content {
+    line-height: 1.6;
+    font-size: 1rem;
+    color: #191919;
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+}
+
+
+.article-content h2 {
+    color: #1e40af;
+    margin-top: 0.2rem;
+    font-weight: 410;
+    font-size: 1.42rem;
+    margin-bottom: 0.2rem;
+}
+
+.article-content p {
+    margin-bottom: 1.6rem;
+    font-size: 1.15rem;
+}
+
+.article-content a {
+    color: #1e40af;
+    text-decoration: underline;
+}
+
+.article-content a:hover {
+    color: #0ea5e9;
+    text-decoration: none;
+}
+
+.article-content blockquote {
+    border-left: 4px solid #1e40af;
+    padding-left: 1rem;
+    color: #6b7280;
+    font-style: italic;
+    margin: 1.5rem 0;
+}
+
+.article-content ul,
+.article-content ol {
+    margin: 1rem 0;
+    padding-left: 1.5rem;
+}
+
+.article-content ul li,
+.article-content ol li {
+    margin-bottom: 0.5rem;
+}
+
+.article-content img {
+    max-width: 100%;
+    height: auto;
+    margin: 1.5rem 0;
+}
+
+.article-content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.5rem 0;
+}
+
+.article-content table th,
+.article-content table td {
+    border: 1px solid #ddd;
+    padding: 0.5rem;
+}
+
+.article-content table th {
+    background-color: #f3f4f6;
+    color: #1e40af;
+}
