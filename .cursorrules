@@ -1,5 +1,5 @@
 I am creating a website that can host my own articles.
 
-The tech stack is Elixir, Phoenix and LiveView. TailwindCSS is used for the frontend. The project is to be deployed on Azure App Service. It will use Postgres version 15 and be available on the public internet. 
+The tech stack is Elixir, Phoenix and LiveView. TailwindCSS is used for the frontend. The project is to be deployed on Fly.io. It will use Postgres version 15 and be available on the public internet. 
 
 Note that I am developing this within an Arch Linux environment. Also that I am new to developing with Docker and would appreciate tips on doing this effectively froma DevOps and efficiency perspective.
