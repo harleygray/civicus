@@ -36,6 +36,7 @@ defmodule Civicus.MixProject do
       {:phoenix_ecto, "~> 4.4"},
       {:ecto_sql, "~> 3.10"},
       {:postgrex, ">= 0.0.0"},
+      {:html_sanitize_ex, "~> 1.4"},
       {:earmark, "~> 1.4.0"},
       {:phoenix_html, "~> 4.0"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
