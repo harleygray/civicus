@@ -63,6 +63,10 @@ if config_env() == :prod do
       ip: {0, 0, 0, 0, 0, 0, 0, 0},
       port: port
     ],
+    check_origin: [
+      "https://civicus.fyi",
+      "https://www.civicus.fyi"
+    ],
     secret_key_base: secret_key_base
 
   # ## SSL Support
