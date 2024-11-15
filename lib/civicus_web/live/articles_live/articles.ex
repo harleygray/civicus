@@ -16,8 +16,13 @@ defmodule CivicusWeb.Articles do
         title: article.title,
         excerpt: article.excerpt || String.slice(article.content || "", 0, 100),
         slug: article.slug,
-        published_at: article.published_at
+        published_at: article.published_at,
+        status: article.status
       }
     end)
   end
+
+  defp humanize_status(:wip), do: "Work in Progress"
+  defp humanize_status(:published), do: "Published"
+  defp humanize_status(_), do: "Unknown"
 end
