@@ -23,11 +23,12 @@
         <.input field={f[:content]} type="textarea" label="Content" />
         <.input field={f[:excerpt]} type="textarea" label="Excerpt" />
         <.input field={f[:published_at]} type="date" label="Published At" />
-
-        <div class="form-actions">
-          <.button phx-disable-with="Saving...">Save Article</.button>
-          <.button type="button" phx-click="cancel" class="cancel-button">Cancel</.button>
-        </div>
+        <.input
+          field={f[:status]}
+          type="select"
+          label="Status"
+          options={[{"Work in Progress", :wip}, {"Published", :published}]}
+        />
       </.form>
     <% end %>
 
@@ -37,6 +38,7 @@
           <h2 class="article-title"><%= article.title %></h2>
           <div class="article-meta">
             <p>Slug: <%= article.slug %></p>
+            <p>Status: <%= humanize_status(article.status) %></p>
             <p>
               Published:
               <%= if article.published_at do %>

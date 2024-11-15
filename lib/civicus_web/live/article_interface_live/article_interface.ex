@@ -16,7 +16,8 @@ defmodule CivicusWeb.ArticleInterface do
        articles: list_articles(),
        changeset: Content.change_article(%Article{}),
        show_form: false,
-       editing_article: nil
+       editing_article: nil,
+       statuses: [{"Work in Progress", :wip}, {"Published", :published}]
      )}
   end
 
@@ -96,4 +97,8 @@ defmodule CivicusWeb.ArticleInterface do
   defp list_articles do
     Content.list_articles()
   end
+
+  defp humanize_status(:wip), do: "Work in Progress"
+  defp humanize_status(:published), do: "Published"
+  defp humanize_status(_), do: "Unknown"
 end

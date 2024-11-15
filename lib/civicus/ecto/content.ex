@@ -30,4 +30,43 @@ defmodule Civicus.Content do
   def change_article(%Article{} = article, attrs \\ %{}) do
     Article.changeset(article, attrs)
   end
+
+  @doc """
+  Returns a list of articles filtered by status.
+  """
+  def list_articles_by_status(status) when status in [:wip, :published] do
+    Repo.all(from a in Article, where: a.status == ^status)
+  end
+
+  @doc """
+  Returns a list of published articles, ordered by published_at date.
+  Useful for public-facing pages.
+  """
+  def list_published_articles do
+    Repo.all(
+      from a in Article,
+        where: a.status == :published,
+        order_by: [desc: a.published_at]
+    )
+  end
+
+  @doc """
+  Publishes an article by updating its status and setting published_at date.
+  """
+  def publish_article(%Article{} = article) do
+    now = Date.utc_today()
+
+    article
+    |> Article.changeset(%{status: :published, published_at: now})
+    |> Repo.update()
+  end
+
+  @doc """
+  Unpublishes an article by setting status back to WIP.
+  """
+  def unpublish_article(%Article{} = article) do
+    article
+    |> Article.changeset(%{status: :wip, published_at: nil})
+    |> Repo.update()
+  end
 end
