@@ -29,6 +29,10 @@
           label="Status"
           options={[{"Work in Progress", :wip}, {"Published", :published}]}
         />
+        <div class="mt-6 flex items-center justify-end gap-4">
+          <.button type="button" phx-click="cancel" class="button-secondary">Cancel</.button>
+          <.button type="submit" class="button-primary">Save</.button>
+        </div>
       </.form>
     <% end %>
 
