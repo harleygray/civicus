@@ -38,3 +38,4 @@ npm-debug.log
 .env
 
 /config/dev.exs
+config/dev.exs
