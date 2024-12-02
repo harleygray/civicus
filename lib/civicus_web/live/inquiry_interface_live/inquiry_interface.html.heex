@@ -1,0 +1,79 @@
+<.live_component module={HeaderNav} id="header_nav" />
+<div class="container mx-auto px-4 py-8">
+  <div class="flex justify-between items-center mb-8">
+    <h1 class="text-2xl font-bold">Senate Inquiries</h1>
+    <button phx-click="new_inquiry" class="button-primary">
+      New Inquiry
+    </button>
+  </div>
+
+  <%= if @show_form do %>
+    <.form
+      :let={f}
+      for={@changeset}
+      phx-submit="save"
+      class="space-y-6 bg-white p-6 rounded-lg shadow mb-8"
+    >
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <.input field={f[:name]} type="text" label="Name" />
+        <.input field={f[:youtube_url]} type="text" label="YouTube URL" />
+        <.input field={f[:youtube_embed]} type="text" label="YouTube Embed URL" />
+        <.input field={f[:committee]} type="text" label="Committee" />
+        <.input field={f[:date_held]} type="date" label="Date Held" />
+        <.input
+          field={f[:senators]}
+          type="text"
+          label="Senators (comma-separated)"
+          phx-debounce="blur"
+        />
+      </div>
+
+      <div class="mt-4">
+        <button
+          type="button"
+          phx-click="toggle_advanced"
+          class="text-sm text-gray-600 hover:text-gray-900"
+        >
+          <%= if @show_advanced do %>
+            ▼ Hide Advanced Options
+          <% else %>
+            ▶ Show Advanced Options
+          <% end %>
+        </button>
+
+        <%= if @show_advanced do %>
+          <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <.input
+              field={f[:slug]}
+              type="text"
+              label="URL Slug (optional)"
+              phx-debounce="blur"
+              placeholder="auto-generated-if-empty"
+            />
+          </div>
+        <% end %>
+      </div>
+
+      <div class="flex justify-end space-x-4">
+        <button type="button" phx-click="cancel" class="button-secondary">
+          Cancel
+        </button>
+        <button type="submit" class="button-primary">
+          Save
+        </button>
+      </div>
+    </.form>
+  <% end %>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <%= for inquiry <- @inquiries do %>
+      <.live_component
+        module={CivicusWeb.Components.InquiryCard}
+        id={"inquiry-#{inquiry.id}"}
+        inquiry={inquiry}
+        show_fields={[:committee, :date_held, :status, :slug]}
+        show_edit={true}
+      />
+    <% end %>
+  </div>
+</div>

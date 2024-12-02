@@ -20,6 +20,14 @@ if System.get_env("PHX_SERVER") do
   config :civicus, CivicusWeb.Endpoint, server: true
 end
 
+config :civicus,
+       :assembly_ai_key,
+       System.get_env("ASSEMBLYAI_API_KEY") ||
+         raise("""
+         environment variable ASSEMBLYAI_API_KEY is missing.
+         Please set this environment variable or add it to your .env file
+         """)
+
 if config_env() == :prod do
   database_url =
     System.get_env("DATABASE_URL") ||
@@ -118,4 +126,16 @@ if config_env() == :prod do
   #     config :swoosh, :api_client, Swoosh.ApiClient.Hackney
   #
   # See https://hexdocs.pm/swoosh/Swoosh.html#module-installation for details.
+
+  config :civicus, Oban,
+    repo: Civicus.Repo,
+    plugins: [
+      # 1 day
+      {Oban.Plugins.Pruner, max_age: 60 * 60 * 24},
+      {Oban.Plugins.Stager, interval: :timer.seconds(5)}
+    ],
+    queues: [
+      media_processing: 1,
+      default: 10
+    ]
 end

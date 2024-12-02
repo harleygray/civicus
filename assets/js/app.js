@@ -23,10 +23,23 @@ import { LiveSocket } from "phoenix_live_view"
 import topbar from "../vendor/topbar"
 
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
+
+// Add this near your other Phoenix LiveView hooks
+let Hooks = {}
+
+Hooks.CopyToClipboard = {
+  mounted() {
+    this.handleEvent("copy", ({ text }) => {
+      navigator.clipboard.writeText(text)
+    })
+  }
+}
+
 let liveSocket = new LiveSocket("/live", Socket, {
   longPollFallbackMs: 2500,
   params: { _csrf_token: csrfToken },
-  transport_protocol: "websocket"
+  transport_protocol: "websocket",
+  hooks: Hooks
 })
 
 // Show progress bar on live navigation and form submits

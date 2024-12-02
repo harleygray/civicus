@@ -456,3 +456,52 @@ p a:hover {
     background-color: #f3f4f6;
     color: #1e40af;
 }
+
+/* Video Player Component */
+.video-container {
+    max-width: 48rem;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.time-input {
+    width: 8rem;
+    border-radius: 0.375rem;
+    border: 1px solid #d1d5db;
+    padding: 0.5rem;
+    margin-right: 0.5rem;
+}
+
+.time-input:focus {
+    outline: none;
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+}
+
+.jump-button {
+    background: linear-gradient(to right, #1e40af, #0ea5e9);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.jump-button:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+/* Inquiry Card */
+.inquiry-card {
+    background-color: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: all 200ms;
+    border: 1px solid #e5e7eb;
+}
+
+.inquiry-card:hover {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}

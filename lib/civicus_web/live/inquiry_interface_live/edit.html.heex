@@ -1,0 +1,48 @@
+<.live_component module={HeaderNav} id="header_nav" />
+<.header>
+  <.back navigate={~p"/inquiry_interface"}>Back to Inquiries</.back>
+  <%= @page_title %>
+</.header>
+
+<.simple_form for={@form} id="inquiry-form" phx-change="validate" phx-submit="save">
+  <.input field={@form[:name]} type="text" label="Name" />
+  <.input field={@form[:youtube_embed]} type="text" label="YouTube Embed URL" />
+  <.input field={@form[:youtube_url]} type="text" label="YouTube URL" />
+  <.input field={@form[:committee]} type="text" label="Committee" />
+  <.input field={@form[:date_held]} type="date" label="Date Held" />
+  <.input
+    field={@form[:status]}
+    type="select"
+    label="Status"
+    options={[
+      {"Pending", "pending"},
+      {"Downloading", "downloading"},
+      {"Uploading", "uploading"},
+      {"Transcribing", "transcribing"},
+      {"Completed", "completed"},
+      {"Failed", "failed"}
+    ]}
+  />
+  <.input field={@form[:transcript]} type="textarea" label="Transcript" />
+
+  <:actions>
+    <.button type="button" phx-click="transcribe" disabled={@transcribing?}>
+      <%= if @transcribing?, do: "Transcribing...", else: "Start Transcription" %>
+    </.button>
+    <.button phx-disable-with="Saving...">Save Inquiry</.button>
+  </:actions>
+</.simple_form>
+
+<div>
+  <%= if @transcribing? do %>
+    <div class="mt-4 p-4 bg-blue-50 rounded-lg">
+      <p class="text-blue-700">
+        <%= if @progress do %>
+          <%= @progress %>
+        <% else %>
+          Transcription in progress...
+        <% end %>
+      </p>
+    </div>
+  <% end %>
+</div>

@@ -19,8 +19,18 @@ defmodule Civicus.MixProject do
   def application do
     [
       mod: {Civicus.Application, []},
-      extra_applications: [:logger, :runtime_tools]
+      extra_applications: extra_applications()
     ]
+  end
+
+  defp extra_applications do
+    base_apps = [:logger, :runtime_tools]
+
+    if Mix.env() in [:dev] do
+      base_apps ++ [:wallaby]
+    else
+      base_apps
+    end
   end
 
   # Specifies which paths to compile per environment.
@@ -39,7 +49,10 @@ defmodule Civicus.MixProject do
       {:postgrex, ">= 0.0.0"},
       {:html_sanitize_ex, "~> 1.4"},
       {:earmark, "~> 1.4.0"},
+      {:wallaby, "~> 0.30.9", only: [:dev]},
       {:earmark_parser, "~> 1.4"},
+      {:httpoison, "~> 2.0"},
+      {:oban, "~> 2.18"},
       {:phoenix_html, "~> 4.0"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
       {:phoenix_live_view, "~> 0.20.2"},

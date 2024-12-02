@@ -11,6 +11,7 @@ defmodule Civicus.Application do
       CivicusWeb.Telemetry,
       Civicus.Repo,
       {DNSCluster, query: Application.get_env(:civicus, :dns_cluster_query) || :ignore},
+      {Oban, Application.fetch_env!(:civicus, Oban)},
       {Phoenix.PubSub, name: Civicus.PubSub},
       # Start the Finch HTTP client for sending emails
       {Finch, name: Civicus.Finch},

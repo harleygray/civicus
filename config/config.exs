@@ -11,6 +11,13 @@ config :civicus,
   ecto_repos: [Civicus.Repo],
   generators: [timestamp_type: :utc_datetime]
 
+config :civicus, Oban,
+  repo: Civicus.Repo,
+  plugins: [Oban.Plugins.Pruner],
+  queues: [media_processing: 10],
+  peer: false,
+  shutdown_grace_period: :timer.minutes(30)
+
 # Configures the endpoint
 config :civicus, CivicusWeb.Endpoint,
   url: [host: "localhost"],

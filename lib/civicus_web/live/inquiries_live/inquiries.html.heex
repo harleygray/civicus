@@ -1,0 +1,18 @@
+<body>
+  <.live_component module={HeaderNav} id="header_nav" />
+
+  <div class="padding-container">
+    <h2 class="heading-text">Inquiries</h2>
+    <p class="cta-text">
+      Here is my work-in-progress Senate Inquiries assistant.
+
+      It's built to help us discover interesting information in the Senate's inquiries.
+    </p>
+  </div>
+
+  <.live_component
+    module={CivicusWeb.Components.VideoPlayer}
+    id="video_player"
+    inquiry={@selected_inquiry}
+  />
+</body>
