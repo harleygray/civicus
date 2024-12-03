@@ -1,48 +1,100 @@
-<.live_component module={HeaderNav} id="header_nav" />
-<.header>
-  <.back navigate={~p"/inquiry_interface"}>Back to Inquiries</.back>
-  <%= @page_title %>
-</.header>
+<div class="flex flex-col h-screen">
+  <.live_component module={HeaderNav} id="header_nav" class="w-full" />
 
-<.simple_form for={@form} id="inquiry-form" phx-change="validate" phx-submit="save">
-  <.input field={@form[:name]} type="text" label="Name" />
-  <.input field={@form[:youtube_embed]} type="text" label="YouTube Embed URL" />
-  <.input field={@form[:youtube_url]} type="text" label="YouTube URL" />
-  <.input field={@form[:committee]} type="text" label="Committee" />
-  <.input field={@form[:date_held]} type="date" label="Date Held" />
-  <.input
-    field={@form[:status]}
-    type="select"
-    label="Status"
-    options={[
-      {"Pending", "pending"},
-      {"Downloading", "downloading"},
-      {"Uploading", "uploading"},
-      {"Transcribing", "transcribing"},
-      {"Completed", "completed"},
-      {"Failed", "failed"}
-    ]}
-  />
-  <.input field={@form[:transcript]} type="textarea" label="Transcript" />
+  <div class="flex flex-1 overflow-hidden">
+    <.live_component
+      module={SidebarEditor}
+      id="sidebar_editor"
+      inquiry={@inquiry}
+      form={@form}
+      transcribing?={@transcribing?}
+    />
 
-  <:actions>
-    <.button type="button" phx-click="transcribe" disabled={@transcribing?}>
-      <%= if @transcribing?, do: "Transcribing...", else: "Start Transcription" %>
-    </.button>
-    <.button phx-disable-with="Saving...">Save Inquiry</.button>
-  </:actions>
-</.simple_form>
+    <div class="flex flex-1 overflow-hidden">
+      <div class="flex-1 overflow-auto pl-96">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div class="bg-white shadow-sm rounded-lg">
+            <div class="px-4 py-5 sm:p-6">
+              <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Transcript</h3>
 
-<div>
-  <%= if @transcribing? do %>
-    <div class="mt-4 p-4 bg-blue-50 rounded-lg">
-      <p class="text-blue-700">
-        <%= if @progress do %>
-          <%= @progress %>
-        <% else %>
-          Transcription in progress...
-        <% end %>
-      </p>
+              <%= if @inquiry.structured_transcript do %>
+                <div class="space-y-8">
+                  <%= for utterance <- @inquiry.structured_transcript["utterances"] || [] do %>
+                    <div class="border-l-4 border-blue-500 pl-4">
+                      <div class="flex items-center mb-2">
+                        <span class="font-semibold text-gray-700">
+                          <%= utterance["speaker"] %>
+                        </span>
+                        <button
+                          class="ml-4 text-sm text-blue-500 hover:text-blue-700"
+                          phx-click="seek_video"
+                          phx-value-time={utterance["start"]}
+                        >
+                          <%= format_timestamp(utterance["start"]) %>
+                        </button>
+                      </div>
+                      <p class="text-gray-800"><%= utterance["text"] %></p>
+                    </div>
+                  <% end %>
+
+                  <div class="mt-8 border-t pt-6">
+                    <h4 class="text-md font-medium text-gray-900 mb-4">Word-Level Data</h4>
+                    <div class="bg-gray-50 p-4 rounded-lg overflow-x-auto">
+                      <%= for word <- @inquiry.structured_transcript["words"] || [] do %>
+                        <span
+                          class="inline-block mr-1 text-sm"
+                          title={"Confidence: #{Float.round(word["confidence"] * 100, 1)}%"}
+                        >
+                          <%= word["text"] %>
+                        </span>
+                      <% end %>
+                    </div>
+                  </div>
+
+                  <div class="mt-8 border-t pt-6">
+                    <h4 class="text-md font-medium text-gray-900 mb-4">Key Highlights</h4>
+                    <div class="grid grid-cols-1 gap-4">
+                      <%= for highlight <- (@inquiry.structured_transcript["auto_highlights_result"]["results"] || []) do %>
+                        <div class="bg-gray-50 p-3 rounded-lg">
+                          <p class="font-medium text-gray-700"><%= highlight["text"] %></p>
+                          <p class="text-sm text-gray-500">
+                            Mentioned <%= highlight["count"] %> times - Relevance: <%= Float.round(
+                              highlight["rank"] * 100
+                            ) %>%
+                          </p>
+                        </div>
+                      <% end %>
+                    </div>
+                  </div>
+                </div>
+              <% else %>
+                <p class="text-gray-500 italic">No structured transcript available yet.</p>
+              <% end %>
+
+              <%= if @transcribing? do %>
+                <div class="mt-4 p-4 bg-blue-50 rounded-lg">
+                  <p class="text-blue-700">
+                    <%= if @progress do %>
+                      <%= @progress %>
+                    <% else %>
+                      Transcription in progress...
+                    <% end %>
+                  </p>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="w-1/5 min-w-[320px] h-screen overflow-y-auto bg-gray-50 p-4 border-l">
+        <.live_component
+          module={VideoPlayer}
+          id="video_player"
+          inquiry={@inquiry}
+          current_time={@current_time}
+        />
+      </div>
     </div>
-  <% end %>
+  </div>
 </div>

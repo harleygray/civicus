@@ -505,3 +505,38 @@ p a:hover {
 .inquiry-card:hover {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
+
+/* Add these to your existing app.css */
+
+.sidebar-editor {
+    @apply z-50;
+}
+
+.sidebar-editor .button-gradient {
+    @apply transition-all duration-200;
+}
+
+.sidebar-editor input[type="text"],
+.sidebar-editor input[type="date"],
+.sidebar-editor select {
+    @apply w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500;
+}
+
+.sidebar-editor label {
+    @apply block text-sm font-medium text-gray-700 mb-1;
+}
+
+.sidebar-editor .form-group {
+    @apply mb-4;
+}
+
+/* Adjust main content padding when sidebar is minimized */
+.sidebar-editor[data-minimized="true"]+.flex-1 {
+    @apply pl-0;
+}
+
+/* Ensure the transcript area scrolls independently */
+.transcript-container {
+    @apply overflow-y-auto;
+    max-height: calc(100vh - 200px);
+}

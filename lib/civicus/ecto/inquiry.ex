@@ -7,6 +7,7 @@ defmodule Civicus.Inquiries.Inquiry do
     field :youtube_embed, :string
     field :name, :string
     field :transcript, :string
+    field :structured_transcript, :map
     field :senators, {:array, :string}
     field :committee, :string
     field :date_held, :date
@@ -23,6 +24,7 @@ defmodule Civicus.Inquiries.Inquiry do
       :youtube_embed,
       :name,
       :transcript,
+      :structured_transcript,
       :senators,
       :committee,
       :date_held,

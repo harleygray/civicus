@@ -38,7 +38,7 @@ npm-debug.log
 .env
 
 /config/dev.exs
-config/dev.exs
+
 .cursorrules
 /priv/static/audio/
-config/dev.exs
+

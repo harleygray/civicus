@@ -21,8 +21,21 @@ defmodule Civicus.Inquiries do
   Gets a single inquiry by ID.
   Raises `Ecto.NoResultsError` if the Inquiry does not exist.
   """
-  @spec get_inquiry!(integer()) :: Inquiry.t()
-  def get_inquiry!(id), do: Repo.get!(Inquiry, id)
+  def get_inquiry!(slug_or_id) when is_binary(slug_or_id) do
+    case Integer.parse(slug_or_id) do
+      {id, ""} ->
+        # If it's a valid integer string, query by id
+        Repo.get!(Inquiry, id)
+
+      _ ->
+        # Otherwise query by slug
+        Repo.get_by!(Inquiry, slug: slug_or_id)
+    end
+  end
+
+  def get_inquiry!(id) when is_integer(id) do
+    Repo.get!(Inquiry, id)
+  end
 
   @doc """
   Returns a changeset for an inquiry.

@@ -342,10 +342,43 @@ defmodule Civicus.Workers.YoutubeProcessor do
         Logger.debug("[AssemblyAI] Raw polling response: #{body}")
 
         case Jason.decode(body) do
-          {:ok, %{"status" => "completed", "text" => transcript}} ->
+          {:ok, %{"status" => "completed"} = response} ->
             Logger.info("[AssemblyAI] Transcription completed successfully")
             broadcast_progress(inquiry_id, "Transcription complete")
-            {:ok, transcript}
+
+            # Create structured transcript
+            structured_data = %{
+              "text" => response["text"],
+              "words" => response["words"],
+              "utterances" =>
+                Enum.map(response["utterances"] || [], fn utterance ->
+                  %{
+                    "text" => utterance["text"],
+                    "start" => utterance["start"],
+                    "speaker" =>
+                      utterance["speaker"] || "Speaker #{utterance["channel"] || "Unknown"}"
+                  }
+                end),
+              "auto_highlights_result" => response["auto_highlights_result"]
+            }
+
+            # Update inquiry with both transcript and structured data
+            case Inquiries.update_inquiry(
+                   Inquiries.get_inquiry!(inquiry_id),
+                   %{
+                     transcript: response["text"],
+                     structured_transcript: structured_data,
+                     status: "completed"
+                   }
+                 ) do
+              {:ok, _updated_inquiry} ->
+                broadcast_completion(inquiry_id, structured_data)
+                {:ok, response["text"]}
+
+              {:error, error} ->
+                Logger.error("[AssemblyAI] Failed to update inquiry: #{inspect(error)}")
+                {:error, "Failed to update inquiry"}
+            end
 
           {:ok, %{"status" => "error", "error" => error}} ->
             Logger.error("[AssemblyAI] Transcription failed with error: #{error}")
@@ -453,5 +486,29 @@ defmodule Civicus.Workers.YoutubeProcessor do
         Logger.info("Job status for inquiry #{inquiry_id}: #{inspect(job.state)}")
         {:ok, job}
     end
+  end
+
+  defp broadcast_completion(inquiry_id, response) do
+    structured_data = %{
+      transcript: response["text"],
+      structured_transcript: %{
+        "utterances" =>
+          Enum.map(response["utterances"] || [], fn utterance ->
+            %{
+              "text" => utterance["text"],
+              "start" => utterance["start"],
+              "speaker" => utterance["speaker"] || "Speaker #{utterance["channel"] || "Unknown"}"
+            }
+          end),
+        "auto_highlights_result" => response["auto_highlights_result"],
+        "chapters" => response["chapters"]
+      }
+    }
+
+    Phoenix.PubSub.broadcast(
+      Civicus.PubSub,
+      "transcription:#{inquiry_id}",
+      {:transcription_complete, structured_data}
+    )
   end
 end
