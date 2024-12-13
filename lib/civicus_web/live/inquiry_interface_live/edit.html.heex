@@ -13,8 +13,14 @@
     <%= if @inquiry.id do %>
       <div class="flex flex-1 overflow-hidden">
         <div class="flex-1 overflow-auto pl-96">
-          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            {/* Future Timeline and Chapter Manager will go here */}
+          <div class="flex h-full">
+            <div class="w-80 h-full pl-4 relative overflow-visible">
+              <.live_component
+                module={CivicusWeb.Components.TimelineViewer}
+                id="timeline-viewer"
+                inquiry={@inquiry}
+              />
+            </div>
           </div>
         </div>
 

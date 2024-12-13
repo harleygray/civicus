@@ -1,6 +1,7 @@
 @import "tailwindcss/base";
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
+@import "./timeline.css";
 
 /* This file is for your main application CSS */
 body {
@@ -642,4 +643,70 @@ p a:hover {
 /* Add this with your other button styles */
 .button-danger {
     @apply px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+/* Remove all existing timeline-related styles and replace with these */
+.line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Add near your other timeline styles */
+.group:hover .group-hover\:visible {
+    visibility: visible;
+    pointer-events: auto;
+}
+
+.invisible {
+    visibility: hidden;
+    pointer-events: none;
+}
+
+/* Timeline specific styles */
+.timeline-container {
+    isolation: isolate;
+    width: 100%;
+}
+
+.timeline-segment {
+    position: relative;
+    overflow: visible;
+    width: 100%;
+}
+
+.timeline-tooltip {
+    visibility: hidden;
+    position: absolute;
+    left: 1.5rem;
+    background: white;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    width: 16rem;
+    z-index: 9999;
+    border: 1px solid #e5e7eb;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 150ms ease-in-out;
+}
+
+.timeline-segment:hover .timeline-tooltip {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* Ensure tooltips appear above other content */
+.timeline-tooltip {
+    z-index: 9999;
+}
+
+/* Remove any conflicting styles */
+.group-hover\:visible {
+    visibility: visible !important;
+}
+
+.invisible {
+    visibility: hidden !important;
 }

@@ -208,4 +208,17 @@ defmodule CivicusWeb.InquiryInterface.Edit do
 
     "#{String.pad_leading(Integer.to_string(minutes), 2, "0")}:#{String.pad_leading(Integer.to_string(remaining_seconds), 2, "0")}"
   end
+
+  def handle_info({:seek_video, time}, socket) do
+    time_ms =
+      case Integer.parse(time) do
+        {val, _} -> val
+        :error -> 0
+      end
+
+    {:noreply,
+     socket
+     |> assign(:current_time, time_ms)
+     |> push_event("seek_video", %{time: div(time_ms, 1000)})}
+  end
 end
