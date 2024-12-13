@@ -2,7 +2,7 @@ defmodule CivicusWeb.InquiryInterface.Edit do
   use CivicusWeb, :live_view
 
   alias Civicus.Inquiries
-  alias CivicusWeb.Components.{HeaderNav, SidebarEditor, VideoPlayer}
+  alias CivicusWeb.Components.{HeaderNav, InquiryEditor, VideoPlayer}
   alias Phoenix.PubSub
   alias Civicus.Inquiries.Inquiry
 
@@ -14,6 +14,7 @@ defmodule CivicusWeb.InquiryInterface.Edit do
      |> assign(:inquiry, %Inquiry{})
      |> assign(:progress, nil)
      |> assign(:transcribing?, false)
+     |> assign(:current_time, 0)
      |> assign(:form, to_form(Inquiries.change_inquiry(%Inquiry{})))}
   end
 

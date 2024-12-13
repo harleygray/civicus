@@ -2,8 +2,6 @@
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
 
-
-
 /* This file is for your main application CSS */
 body {
     margin: 0;
@@ -508,35 +506,140 @@ p a:hover {
 
 /* Add these to your existing app.css */
 
-.sidebar-editor {
+.inquiry-editor {
     @apply z-50;
 }
 
-.sidebar-editor .button-gradient {
+.inquiry-editor .button-gradient {
     @apply transition-all duration-200;
 }
 
-.sidebar-editor input[type="text"],
-.sidebar-editor input[type="date"],
-.sidebar-editor select {
+.inquiry-editor input[type="text"],
+.inquiry-editor input[type="date"],
+.inquiry-editor select {
     @apply w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500;
 }
 
-.sidebar-editor label {
+.inquiry-editor label {
     @apply block text-sm font-medium text-gray-700 mb-1;
 }
 
-.sidebar-editor .form-group {
+.inquiry-editor .form-group {
     @apply mb-4;
 }
 
-/* Adjust main content padding when sidebar is minimized */
-.sidebar-editor[data-minimized="true"]+.flex-1 {
+/* Adjust main content padding when editor is minimized */
+.inquiry-editor[data-minimized="true"]+.flex-1 {
     @apply pl-0;
 }
 
 /* Ensure the transcript area scrolls independently */
 .transcript-container {
     @apply overflow-y-auto;
-    max-height: calc(100vh - 200px);
+    padding: 0.5rem;
+    background-color: white;
+    border-radius: 0.375rem;
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    height: 100%;
+    border-top: 1px solid #e5e7eb;
+}
+
+.transcript-content {
+    padding: 0.5rem;
+    padding-bottom: 2rem;
+}
+
+@screen sm {
+    .transcript-content {
+        padding: 0.4rem;
+    }
+}
+
+.transcript-utterances {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.transcript-utterance {
+    border-left-width: 3px;
+    border-left-color: #3b82f6;
+    padding-left: 0.60rem;
+    font-size: 0.8rem;
+}
+
+.transcript-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.transcript-speaker {
+    font-weight: 600;
+    color: #374151;
+}
+
+.transcript-timestamp {
+    margin-left: 1rem;
+    font-size: 0.875rem;
+    color: #3b82f6;
+}
+
+.transcript-timestamp:hover {
+    color: #1d4ed8;
+}
+
+.transcript-text {
+    color: #1f2937;
+}
+
+.transcript-empty {
+    color: #6b7280;
+    font-style: italic;
+}
+
+.transcript-progress {
+    margin-top: 1rem;
+    padding: 1rem;
+    background-color: #eff6ff;
+    border-radius: 0.375rem;
+}
+
+.transcript-progress-text {
+    color: #1d4ed8;
+}
+
+/* Speaker Editor Styles */
+.speaker-list {
+    @apply divide-y divide-gray-200;
+}
+
+.speaker-list .speaker-item {
+    @apply flex items-center justify-between py-2 transition-colors duration-150;
+}
+
+.speaker-list .speaker-item:hover {
+    @apply bg-gray-50;
+}
+
+.speaker-list input {
+    @apply block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm;
+}
+
+.speaker-list button {
+    @apply p-1 text-gray-400 hover:text-gray-500;
+}
+
+.speaker-list .speaker-id {
+    @apply text-center font-medium bg-gray-50;
+}
+
+/* Make the speaker ID input more compact */
+.speaker-list .speaker-id input {
+    @apply py-1 px-2;
+}
+
+/* Add this with your other button styles */
+.button-danger {
+    @apply px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed;
 }

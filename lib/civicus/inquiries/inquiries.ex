@@ -7,7 +7,6 @@ defmodule Civicus.Inquiries do
   require Logger
   alias Civicus.Repo
   alias Civicus.Inquiries.Inquiry
-  alias Civicus.Workers.YoutubeProcessor
 
   @doc """
   Returns the list of inquiries.
@@ -37,6 +36,10 @@ defmodule Civicus.Inquiries do
     Repo.get!(Inquiry, id)
   end
 
+  def delete_inquiry(%Inquiry{} = inquiry) do
+    Repo.delete(inquiry)
+  end
+
   @doc """
   Returns a changeset for an inquiry.
   Takes an existing inquiry struct and a map of attributes.
@@ -45,6 +48,15 @@ defmodule Civicus.Inquiries do
   @spec change_inquiry(Inquiry.t(), map()) :: Ecto.Changeset.t()
   def change_inquiry(%Inquiry{} = inquiry, attrs \\ %{}) do
     Inquiry.changeset(inquiry, attrs)
+  end
+
+  def update_speaker_mappings(inquiry, speaker_mappings) do
+    Ecto.Multi.new()
+    |> Ecto.Multi.update(
+      :inquiry,
+      Inquiry.changeset(inquiry, %{speaker_mappings: speaker_mappings})
+    )
+    |> Repo.transaction()
   end
 
   @doc """

@@ -13,8 +13,18 @@ config :civicus,
 
 config :civicus, Oban,
   repo: Civicus.Repo,
-  plugins: [Oban.Plugins.Pruner],
-  queues: [media_processing: 10],
+  plugins: [
+    Oban.Plugins.Pruner,
+    {Oban.Plugins.Cron,
+     crontab: [
+       {"@daily", Civicus.Workers.CleanupWorker},
+       {"0 0 * * *", Civicus.Workers.MemberUpdater}
+     ]}
+  ],
+  queues: [
+    media_processing: 10,
+    member_updates: 1
+  ],
   peer: false,
   shutdown_grace_period: :timer.minutes(30)
 
@@ -71,3 +81,5 @@ config :phoenix, :json_library, Jason
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{config_env()}.exs"
+
+config :civicus, :deepgram_api_key, System.get_env("DEEPGRAM_API_KEY")

@@ -1,52 +1,24 @@
-defmodule CivicusWeb.Components.SidebarEditor do
+defmodule CivicusWeb.Components.InquiryEditor do
   use CivicusWeb, :live_component
   alias Civicus.Inquiries
-  alias Phoenix.LiveView.JS
 
+  @impl true
   def render(assigns) do
     ~H"""
-    <div class="sidebar-editor-wrapper">
-      <div class="sidebar-editor">
-        <div class={"fixed inset-y-0 left-0 w-96 bg-white border-r border-gray-200 transform transition-transform duration-300 #{if @minimized?, do: "-translate-x-96", else: "translate-x-0"}"}>
-          <div class="p-6 space-y-6">
-            <div class="flex items-center justify-between">
-              <h2 class="text-lg font-medium text-gray-900">Edit Inquiry</h2>
-              <div class="flex space-x-2">
-                <button
-                  type="button"
-                  class="fixed top-20 left-4 p-2 bg-white rounded-md shadow-lg hover:bg-gray-50 z-50"
-                  phx-click="toggle_sidebar"
-                  phx-target={@myself}
-                >
-                  <span class="sr-only">Toggle sidebar</span>
-                  <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M4 6h16M4 12h16M4 18h16"
-                    />
-                  </svg>
-                </button>
-                <button
-                  type="button"
-                  class="text-gray-400 hover:text-gray-500"
-                  phx-click="close_sidebar"
-                  phx-target={@myself}
-                >
-                  <span class="sr-only">Close sidebar</span>
-                  <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
-                </button>
-              </div>
-            </div>
+    <div class="inquiry-editor-wrapper">
+      <div class="inquiry-editor">
+        <div class="fixed inset-y-0 left-0 w-96 bg-white border-r border-gray-200 flex flex-col">
+          <div class="p-6 border-b border-gray-200 flex items-center justify-between">
+            <h2 class="text-lg font-medium text-gray-900">Edit Inquiry</h2>
+            <.link
+              navigate={~p"/inquiries"}
+              class="text-sm text-blue-600 hover:text-blue-800 hover:underline"
+            >
+              ← Back to Interface
+            </.link>
+          </div>
 
+          <div class="flex-1 overflow-y-auto p-6">
             <.form
               for={@form}
               phx-change="validate"
@@ -97,6 +69,18 @@ defmodule CivicusWeb.Components.SidebarEditor do
               </div>
 
               <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200">
+                <%= if @inquiry.transcript do %>
+                  <.button
+                    type="button"
+                    phx-click="delete_transcript"
+                    phx-target={@myself}
+                    data-confirm="Are you sure you want to delete this transcript? This cannot be undone."
+                    class="button-danger"
+                  >
+                    Delete Transcript
+                  </.button>
+                <% end %>
+
                 <.button
                   type="button"
                   phx-click="transcribe"
@@ -111,33 +95,17 @@ defmodule CivicusWeb.Components.SidebarEditor do
                 </.button>
               </div>
             </.form>
+
+            <.live_component
+              module={CivicusWeb.Components.SpeakerEditor}
+              id="speaker-editor"
+              inquiry={@inquiry}
+            />
           </div>
         </div>
       </div>
-
-      <%= if @minimized? do %>
-        <button
-          type="button"
-          class="fixed top-20 left-4 p-2 bg-white rounded-md shadow-lg hover:bg-gray-50"
-          phx-click="toggle_sidebar"
-          phx-target={@myself}
-        >
-          <svg class="h-6 w-6 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M4 6h16M4 12h16M4 18h16"
-            />
-          </svg>
-        </button>
-      <% end %>
     </div>
     """
-  end
-
-  def mount(socket) do
-    {:ok, assign(socket, minimized?: false)}
   end
 
   @impl true
@@ -152,7 +120,6 @@ defmodule CivicusWeb.Components.SidebarEditor do
 
   @impl true
   def handle_event("save", %{"inquiry" => params}, socket) do
-    # Send the save event to the parent LiveView instead of handling it here
     send(self(), {:save_inquiry, params})
     {:noreply, socket}
   end
@@ -172,11 +139,22 @@ defmodule CivicusWeb.Components.SidebarEditor do
     end
   end
 
-  def handle_event("close_sidebar", _, socket) do
-    {:noreply, push_navigate(socket, to: ~p"/inquiry_interface")}
-  end
+  @impl true
+  def handle_event("delete_transcript", _params, socket) do
+    case Inquiries.update_inquiry(socket.assigns.inquiry, %{
+           transcript: nil,
+           structured_transcript: nil,
+           speaker_mappings: %{}
+         }) do
+      {:ok, updated_inquiry} ->
+        {:noreply,
+         socket
+         |> assign(:inquiry, updated_inquiry)
+         |> assign(:form, to_form(Inquiries.change_inquiry(updated_inquiry)))
+         |> put_flash(:info, "Transcript deleted successfully")}
 
-  def handle_event("toggle_sidebar", _, socket) do
-    {:noreply, assign(socket, minimized?: !socket.assigns.minimized?)}
+      {:error, _changeset} ->
+        {:noreply, put_flash(socket, :error, "Failed to delete transcript")}
+    end
   end
 end

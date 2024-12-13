@@ -13,16 +13,10 @@ defmodule Civicus.Application do
       {DNSCluster, query: Application.get_env(:civicus, :dns_cluster_query) || :ignore},
       {Oban, Application.fetch_env!(:civicus, Oban)},
       {Phoenix.PubSub, name: Civicus.PubSub},
-      # Start the Finch HTTP client for sending emails
       {Finch, name: Civicus.Finch},
-      # Start a worker by calling: Civicus.Worker.start_link(arg)
-      # {Civicus.Worker, arg},
-      # Start to serve requests, typically the last entry
       CivicusWeb.Endpoint
     ]
 
-    # See https://hexdocs.pm/elixir/Supervisor.html
-    # for other strategies and supported options
     opts = [strategy: :one_for_one, name: Civicus.Supervisor]
     Supervisor.start_link(children, opts)
   end

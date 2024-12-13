@@ -3,98 +3,52 @@
 
   <div class="flex flex-1 overflow-hidden">
     <.live_component
-      module={SidebarEditor}
-      id="sidebar_editor"
+      module={CivicusWeb.Components.InquiryEditor}
+      id={@inquiry.id || "new_inquiry"}
       inquiry={@inquiry}
       form={@form}
       transcribing?={@transcribing?}
     />
 
-    <div class="flex flex-1 overflow-hidden">
-      <div class="flex-1 overflow-auto pl-96">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div class="bg-white shadow-sm rounded-lg">
-            <div class="px-4 py-5 sm:p-6">
-              <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Transcript</h3>
+    <%= if @inquiry.id do %>
+      <div class="flex flex-1 overflow-hidden">
+        <div class="flex-1 overflow-auto pl-96">
+          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            {/* Future Timeline and Chapter Manager will go here */}
+          </div>
+        </div>
 
-              <%= if @inquiry.structured_transcript do %>
-                <div class="space-y-8">
-                  <%= for utterance <- @inquiry.structured_transcript["utterances"] || [] do %>
-                    <div class="border-l-4 border-blue-500 pl-4">
-                      <div class="flex items-center mb-2">
-                        <span class="font-semibold text-gray-700">
-                          <%= utterance["speaker"] %>
-                        </span>
-                        <button
-                          class="ml-4 text-sm text-blue-500 hover:text-blue-700"
-                          phx-click="seek_video"
-                          phx-value-time={utterance["start"]}
-                        >
-                          <%= format_timestamp(utterance["start"]) %>
-                        </button>
-                      </div>
-                      <p class="text-gray-800"><%= utterance["text"] %></p>
-                    </div>
-                  <% end %>
+        <div class="w-1/5 min-w-[320px] flex flex-col bg-gray-50 border-l">
+          <div class="p-4 flex-none">
+            <.live_component
+              module={VideoPlayer}
+              id="video_player"
+              inquiry={@inquiry}
+              current_time={@current_time}
+            />
+          </div>
 
-                  <div class="mt-8 border-t pt-6">
-                    <h4 class="text-md font-medium text-gray-900 mb-4">Word-Level Data</h4>
-                    <div class="bg-gray-50 p-4 rounded-lg overflow-x-auto">
-                      <%= for word <- @inquiry.structured_transcript["words"] || [] do %>
-                        <span
-                          class="inline-block mr-1 text-sm"
-                          title={"Confidence: #{Float.round(word["confidence"] * 100, 1)}%"}
-                        >
-                          <%= word["text"] %>
-                        </span>
-                      <% end %>
-                    </div>
-                  </div>
-
-                  <div class="mt-8 border-t pt-6">
-                    <h4 class="text-md font-medium text-gray-900 mb-4">Key Highlights</h4>
-                    <div class="grid grid-cols-1 gap-4">
-                      <%= for highlight <- (@inquiry.structured_transcript["auto_highlights_result"]["results"] || []) do %>
-                        <div class="bg-gray-50 p-3 rounded-lg">
-                          <p class="font-medium text-gray-700"><%= highlight["text"] %></p>
-                          <p class="text-sm text-gray-500">
-                            Mentioned <%= highlight["count"] %> times - Relevance: <%= Float.round(
-                              highlight["rank"] * 100
-                            ) %>%
-                          </p>
-                        </div>
-                      <% end %>
-                    </div>
-                  </div>
-                </div>
-              <% else %>
-                <p class="text-gray-500 italic">No structured transcript available yet.</p>
-              <% end %>
-
-              <%= if @transcribing? do %>
-                <div class="mt-4 p-4 bg-blue-50 rounded-lg">
-                  <p class="text-blue-700">
-                    <%= if @progress do %>
-                      <%= @progress %>
-                    <% else %>
-                      Transcription in progress...
-                    <% end %>
-                  </p>
-                </div>
-              <% end %>
-            </div>
+          <.live_component
+            module={CivicusWeb.Components.TranscriptView}
+            id="transcript_view"
+            inquiry={@inquiry}
+            transcribing?={@transcribing?}
+            progress={@progress}
+            class="flex-1 overflow-auto"
+          />
+        </div>
+      </div>
+    <% else %>
+      <div class="flex-1 overflow-auto pl-96 bg-gray-50">
+        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div class="bg-white shadow rounded-lg p-6">
+            <h2 class="text-lg font-medium text-gray-900 mb-4">Create New Inquiry</h2>
+            <p class="text-sm text-gray-500 mb-4">
+              Fill in the inquiry details in the form on the left. Once created, you'll be able to manage transcripts and other features.
+            </p>
           </div>
         </div>
       </div>
-
-      <div class="w-1/5 min-w-[320px] h-screen overflow-y-auto bg-gray-50 p-4 border-l">
-        <.live_component
-          module={VideoPlayer}
-          id="video_player"
-          inquiry={@inquiry}
-          current_time={@current_time}
-        />
-      </div>
-    </div>
+    <% end %>
   </div>
 </div>
