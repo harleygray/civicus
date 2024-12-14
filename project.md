@@ -27,7 +27,7 @@ Chapter structure:
 
 ### Core Components
 
-1. `InquiryInterface` (LiveView)
+1. `InquiryEditor` (LiveComponent)
    - Main container for all components
    - Manages state and coordinates component interactions
    - Handles chapter creation/editing
@@ -59,20 +59,27 @@ Chapter structure:
    - Highlights current segment
    - Click-to-seek functionality
 
+
 ### Layout Structure
 
 ```
-+------------------------+------------------+
-|        Header         |                  |
-+------------------------+                  |
-| Timeline Visualization |   Transcript    |
-+------------------------+     Editor      |
-|                       |                  |
-|      Video Player     |   Speaker Map    |
-|                       |                  |
-+------------------------+   Chapter List   |
-|    Chapter Timeline   |                  |
-+------------------------+------------------+
++--------------------------------------------------------+
+|                        Header                          |
++------------------------+-------------------------------+
+|    Inquiry       |    Transcript    |  Video Player    |
+|    Editor        |     Timeline     |  (1/4 width)     |
+|   (1/4 width)    +                  +                  |
+|                  |       and        +------------------+
+|                  |     Chapter      |                  |
+|                  |     Manager      |                  |
+|                  |                  |  Transcript View |
+|                  |                  |  (1/4 width)     |
+|                  |                  |                  |
+|                  |                  |                  |
+|                  |                  |                  |
+|                  |                  |                  |  
+|                  |                  |                  |
++------------------------+-------------------------------+
 ```
 
 ## CSS Structure

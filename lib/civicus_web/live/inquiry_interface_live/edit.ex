@@ -221,4 +221,47 @@ defmodule CivicusWeb.InquiryInterface.Edit do
      |> assign(:current_time, time_ms)
      |> push_event("seek_video", %{time: div(time_ms, 1000)})}
   end
+
+  def handle_info({:update_chapters, chapters}, socket) do
+    case Inquiries.update_inquiry(socket.assigns.inquiry, %{chapters: chapters}) do
+      {:ok, inquiry} ->
+        {:noreply,
+         socket
+         |> assign(:inquiry, inquiry)
+         |> put_flash(:info, "Chapters updated successfully")}
+
+      {:error, _changeset} ->
+        {:noreply,
+         socket
+         |> put_flash(:error, "Error updating chapters")}
+    end
+  end
+
+  def handle_info({:set_chapter_time, chapter_id, field}, socket) do
+    current_time = socket.assigns.current_time
+
+    updated_chapters =
+      update_in(
+        socket.assigns.inquiry.chapters,
+        [chapter_id],
+        &Map.put(&1, field, current_time)
+      )
+
+    case Inquiries.update_inquiry(socket.assigns.inquiry, %{chapters: updated_chapters}) do
+      {:ok, inquiry} ->
+        {:noreply,
+         socket
+         |> assign(:inquiry, inquiry)
+         |> put_flash(:info, "Chapter time updated")}
+
+      {:error, _changeset} ->
+        {:noreply,
+         socket
+         |> put_flash(:error, "Error updating chapter time")}
+    end
+  end
+
+  def handle_info({:flash, {type, message}}, socket) do
+    {:noreply, put_flash(socket, type, message)}
+  end
 end

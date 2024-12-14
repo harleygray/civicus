@@ -34,6 +34,20 @@ let Hooks = {
         navigator.clipboard.writeText(text)
       })
     }
+  },
+  ChapterType: {
+    mounted() {
+      this.el.addEventListener("change", (e) => {
+        const chapterId = this.el.dataset.chapterId
+        const target = this.el.dataset.phxTarget
+        const value = e.target.value
+
+        this.pushEventTo(`#chapter-editor-${target}`, "update_chapter_type", {
+          chapter_id: chapterId,
+          type: value
+        })
+      })
+    }
   }
 }
 

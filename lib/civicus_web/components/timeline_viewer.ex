@@ -10,7 +10,7 @@ defmodule CivicusWeb.Components.TimelineViewer do
             <%= for {segment, index} <- Enum.with_index(timeline_segments(@inquiry.structured_transcript["utterances"], @inquiry.speaker_mappings)) do %>
               <div
                 class="timeline-segment group"
-                style={"height: #{segment.height_percentage}px; min-height: 4px;"}
+                style={"height: #{segment.height_percentage}px; min-height: 10px;"}
                 phx-click="seek_video"
                 phx-value-time={trunc(segment.start)}
                 phx-target={@myself}
@@ -57,7 +57,7 @@ defmodule CivicusWeb.Components.TimelineViewer do
     |> Enum.map(fn [current, next] ->
       end_time = if next, do: next["start"], else: current["start"] + 10_000
       duration = end_time - current["start"]
-      height = max(4, duration / total_duration * 700)
+      height = max(20, duration / total_duration * 14000)
 
       %{
         speaker: current["speaker"],

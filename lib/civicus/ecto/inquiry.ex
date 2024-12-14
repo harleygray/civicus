@@ -14,6 +14,7 @@ defmodule Civicus.Inquiries.Inquiry do
     field :status, :string, default: "pending"
     field :slug, :string
     field :speaker_mappings, :map
+    field :chapters, :map, default: %{}
 
     timestamps()
   end
@@ -31,7 +32,8 @@ defmodule Civicus.Inquiries.Inquiry do
       :date_held,
       :status,
       :slug,
-      :speaker_mappings
+      :speaker_mappings,
+      :chapters
     ])
     |> validate_required([:youtube_url, :youtube_embed, :name])
     |> maybe_generate_slug()

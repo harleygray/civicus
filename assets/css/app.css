@@ -674,6 +674,8 @@ p a:hover {
     position: relative;
     overflow: visible;
     width: 100%;
+    min-height: 20px;
+    margin: 2px 0;
 }
 
 .timeline-tooltip {
