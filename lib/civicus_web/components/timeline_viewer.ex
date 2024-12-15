@@ -3,11 +3,11 @@ defmodule CivicusWeb.Components.TimelineViewer do
 
   def render(assigns) do
     ~H"""
-    <div class="timeline-container h-full w-full relative">
-      <div class="absolute inset-0 overflow-y-auto" style="direction: rtl;">
-        <div class="h-full pl-3" style="direction: ltr;">
-          <div class="flex flex-col h-full bg-gray-100 rounded-full p-1 w-2">
-            <%= for {segment, index} <- Enum.with_index(timeline_segments(@inquiry.structured_transcript["utterances"], @inquiry.speaker_mappings)) do %>
+    <div class="timeline-viewer">
+      <%= if has_transcript?(@inquiry) do %>
+        <div class="h-full flex flex-col">
+          <div class="flex-1 overflow-y-auto">
+            <%= for {segment, index} <- Enum.with_index(timeline_segments(@inquiry.structured_transcript["utterances"], @current_time)) do %>
               <div
                 class="timeline-segment group"
                 style={"height: #{segment.height_percentage}px; min-height: 10px;"}
@@ -40,16 +40,41 @@ defmodule CivicusWeb.Components.TimelineViewer do
             <% end %>
           </div>
         </div>
-      </div>
+      <% else %>
+        <div class="h-full flex items-center justify-center text-gray-500">
+          <p>No transcript available</p>
+        </div>
+      <% end %>
     </div>
     """
   end
 
   def mount(socket) do
-    {:ok, socket}
+    {:ok, assign(socket, current_time: 0)}
   end
 
-  defp timeline_segments(utterances, _speaker_mappings) do
+  def update(assigns, socket) do
+    {:ok,
+     socket
+     |> assign(:inquiry, assigns.inquiry)
+     |> assign(:current_time, assigns[:current_time] || 0)}
+  end
+
+  defp has_transcript?(inquiry) do
+    case inquiry do
+      %{structured_transcript: %{"utterances" => utterances}}
+      when is_list(utterances) and utterances != [] ->
+        true
+
+      _ ->
+        false
+    end
+  end
+
+  defp timeline_segments(nil, _current_time), do: []
+  defp timeline_segments([], _current_time), do: []
+
+  defp timeline_segments(utterances, _current_time) do
     total_duration = calculate_total_duration(utterances)
 
     utterances
@@ -69,10 +94,13 @@ defmodule CivicusWeb.Components.TimelineViewer do
     end)
   end
 
+  defp calculate_total_duration(nil), do: 0
+  defp calculate_total_duration([]), do: 0
+
   defp calculate_total_duration(utterances) do
-    last_utterance = List.last(utterances)
-    # Add 10 seconds for the last segment
-    last_utterance["start"] + 10_000
+    utterances
+    |> List.last()
+    |> Map.get("start", 0)
   end
 
   defp format_timestamp(milliseconds) do

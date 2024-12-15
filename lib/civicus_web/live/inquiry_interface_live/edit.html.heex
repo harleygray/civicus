@@ -13,21 +13,59 @@
     <%= if @inquiry.id do %>
       <div class="flex flex-1 overflow-hidden">
         <div class="flex-1 overflow-auto pl-96">
-          <div class="flex h-full">
-            <div class="w-80 h-full pl-4 relative overflow-visible">
-              <.live_component
-                module={CivicusWeb.Components.TimelineViewer}
-                id="timeline-viewer"
-                inquiry={@inquiry}
-              />
+          <div class="flex flex-col h-full">
+            <div class="bg-white shadow-sm border-b px-4 py-2 mx-auto w-full">
+              <div class="flex items-center justify-center gap-4">
+                <div class="flex items-center gap-2">
+                  <label class="text-sm font-medium text-gray-700">Start Time:</label>
+                  <input
+                    type="text"
+                    value={format_timestamp(@start_time)}
+                    class="block w-32 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    phx-blur="update_time_range"
+                    phx-value-target="start_time"
+                    placeholder="MM:SS"
+                  />
+                </div>
+
+                <div class="flex items-center gap-2">
+                  <label class="text-sm font-medium text-gray-700">End Time:</label>
+                  <input
+                    type="text"
+                    value={format_timestamp(@end_time)}
+                    class="block w-32 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    phx-blur="update_time_range"
+                    phx-value-target="end_time"
+                    placeholder="MM:SS"
+                  />
+                </div>
+
+                <button
+                  phx-click="process_markers"
+                  class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                >
+                  Process Markers
+                </button>
+              </div>
             </div>
 
-            <div class="flex-1 p-4 overflow-auto">
-              <.live_component
-                module={CivicusWeb.Components.ChapterEditor}
-                id="chapter-editor"
-                inquiry={@inquiry}
-              />
+            <div class="flex flex-1">
+              <div class="w-80 h-full pl-4 relative overflow-visible">
+                <.live_component
+                  module={CivicusWeb.Components.TimelineViewer}
+                  id="timeline-viewer"
+                  inquiry={@inquiry}
+                  current_time={@current_time}
+                />
+              </div>
+
+              <div class="flex-1 p-4 overflow-auto">
+                <.live_component
+                  module={CivicusWeb.Components.ChapterEditor}
+                  id="chapter-editor"
+                  inquiry={@inquiry}
+                />
+              </div>
             </div>
           </div>
         </div>

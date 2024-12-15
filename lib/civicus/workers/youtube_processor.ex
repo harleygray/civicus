@@ -117,6 +117,7 @@ defmodule Civicus.Workers.YoutubeProcessor do
           punctuate: true,
           diarize: true,
           utterances: true,
+          paragraphs: true,
           language: "en-AU",
           model: "nova-2",
           smart_format: true
@@ -179,23 +180,63 @@ defmodule Civicus.Workers.YoutubeProcessor do
 
   defp process_deepgram_response(%{"results" => results}) do
     alternatives = get_in(results, ["channels", Access.at(0), "alternatives", Access.at(0)])
-    words = alternatives["words"] || []
 
+    # Get paragraphs data if available, otherwise fall back to words
     utterances =
-      Enum.chunk_by(words, & &1["speaker"])
-      |> Enum.map(fn words ->
-        %{
-          "text" => Enum.map_join(words, " ", & &1["word"]),
-          "start" => List.first(words)["start"] * 1000,
-          "speaker" => "Speaker #{List.first(words)["speaker"]}"
-        }
-      end)
+      case alternatives do
+        %{"paragraphs" => %{"paragraphs" => paragraphs}} ->
+          # Flatten all sentences from all paragraphs
+          paragraphs
+          |> Enum.flat_map(fn paragraph ->
+            paragraph["sentences"]
+            |> Enum.map(fn sentence ->
+              # Find the speaker for this time range from the words array
+              speaker =
+                find_speaker_for_timerange(
+                  alternatives["words"],
+                  sentence["start"],
+                  sentence["end"]
+                )
+
+              %{
+                "text" => sentence["text"],
+                # Convert to ms
+                "start" => trunc(sentence["start"] * 1000),
+                "speaker" => "Speaker #{speaker}"
+              }
+            end)
+          end)
+
+        _ ->
+          # Fall back to original speaker-based chunking
+          words = alternatives["words"] || []
+
+          Enum.chunk_by(words, & &1["speaker"])
+          |> Enum.map(fn words ->
+            %{
+              "text" => Enum.map_join(words, " ", & &1["word"]),
+              "start" => List.first(words)["start"] * 1000,
+              "speaker" => "Speaker #{List.first(words)["speaker"]}"
+            }
+          end)
+      end
 
     %{
       "text" => alternatives["transcript"],
       "utterances" => utterances,
       "auto_highlights_result" => nil
     }
+  end
+
+  # Helper function to find the most common speaker in a time range
+  defp find_speaker_for_timerange(words, start_time, end_time) do
+    words
+    |> Enum.filter(fn word ->
+      word["start"] >= start_time && word["start"] <= end_time
+    end)
+    |> Enum.group_by(& &1["speaker"])
+    |> Enum.max_by(fn {_speaker, words} -> length(words) end, fn -> {0, []} end)
+    |> elem(0)
   end
 
   defp update_inquiry_with_transcript(inquiry, transcript) do

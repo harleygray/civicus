@@ -33,6 +33,8 @@ defmodule CivicusWeb.InquiryInterface.Edit do
          |> assign(:progress, nil)
          |> assign(:transcribing?, false)
          |> assign(:current_time, 0)
+         |> assign(:start_time, 0)
+         |> assign(:end_time, 0)
          |> assign(:form, to_form(Inquiries.change_inquiry(inquiry)))}
 
       nil ->
@@ -201,13 +203,15 @@ defmodule CivicusWeb.InquiryInterface.Edit do
      |> push_event("seek_video", %{time: time_seconds})}
   end
 
-  def format_timestamp(milliseconds) do
+  def format_timestamp(milliseconds) when is_number(milliseconds) do
     seconds = div(milliseconds, 1000)
     minutes = div(seconds, 60)
     remaining_seconds = rem(seconds, 60)
 
     "#{String.pad_leading(Integer.to_string(minutes), 2, "0")}:#{String.pad_leading(Integer.to_string(remaining_seconds), 2, "0")}"
   end
+
+  def format_timestamp(_), do: "00:00"
 
   def handle_info({:seek_video, time}, socket) do
     time_ms =
@@ -263,5 +267,103 @@ defmodule CivicusWeb.InquiryInterface.Edit do
 
   def handle_info({:flash, {type, message}}, socket) do
     {:noreply, put_flash(socket, type, message)}
+  end
+
+  @impl true
+  def handle_event("update_time_range", params, socket) do
+    %{"value" => time_str, "target" => target} = params
+
+    with {:ok, time_ms} <- parse_timestamp(time_str) do
+      socket =
+        case target do
+          "start_time" -> assign(socket, :start_time, time_ms)
+          "end_time" -> assign(socket, :end_time, time_ms)
+          _ -> socket
+        end
+
+      require Logger
+
+      Logger.info(
+        "Updated time range - Start: #{socket.assigns.start_time}, End: #{socket.assigns.end_time}"
+      )
+
+      {:noreply, socket}
+    else
+      :error ->
+        {:noreply,
+         socket
+         |> put_flash(:error, "Invalid time format. Please use MM:SS")}
+    end
+  end
+
+  @impl true
+  def handle_event("process_markers", _params, socket) do
+    %{inquiry: inquiry, start_time: start_time, end_time: end_time} = socket.assigns
+
+    case inquiry.structured_transcript do
+      %{"utterances" => utterances} ->
+        require Logger
+
+        Logger.info(
+          "Processing segments between #{format_timestamp(start_time)} and #{format_timestamp(end_time)}"
+        )
+
+        filtered_segments =
+          utterances
+          |> Enum.filter(fn utterance ->
+            start = Map.get(utterance, "start", 0)
+            # Convert float to integer if needed
+            start = if is_float(start), do: trunc(start), else: start
+            start >= start_time && start <= end_time
+          end)
+          |> Enum.map(fn utterance ->
+            %{
+              "speaker" => Map.get(utterance, "speaker", "Unknown"),
+              "start" => Map.get(utterance, "start", 0),
+              "text" => Map.get(utterance, "text", "")
+            }
+          end)
+
+        Logger.info("Found #{length(filtered_segments)} segments")
+
+        if Enum.empty?(filtered_segments) do
+          {:noreply, put_flash(socket, :error, "No segments found in the selected time range")}
+        else
+          case Civicus.Transcript.TranscriptMarkers.process_segments(filtered_segments) do
+            {:ok, markers} when is_list(markers) ->
+              Logger.info("Processed #{length(markers)} markers")
+
+              {:noreply,
+               put_flash(socket, :info, "Successfully processed #{length(markers)} markers")}
+
+            {:ok, _} ->
+              {:noreply,
+               put_flash(socket, :error, "Unexpected response format from marker processing")}
+
+            {:error, error} ->
+              {:noreply, put_flash(socket, :error, "Error processing markers: #{error}")}
+          end
+        end
+
+      _ ->
+        {:noreply, put_flash(socket, :error, "No transcript available")}
+    end
+  end
+
+  defp parse_timestamp(time_str) do
+    case String.split(time_str, ":") do
+      [minutes_str, seconds_str] ->
+        with {minutes, ""} <- Integer.parse(minutes_str),
+             {seconds, ""} <- Integer.parse(seconds_str),
+             true <- seconds >= 0 and seconds < 60,
+             true <- minutes >= 0 do
+          {:ok, (minutes * 60 + seconds) * 1000}
+        else
+          _ -> :error
+        end
+
+      _ ->
+        :error
+    end
   end
 end

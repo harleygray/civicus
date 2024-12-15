@@ -104,8 +104,12 @@ defmodule CivicusWeb.Components.ChapterEditor do
                       <input
                         type="text"
                         value={format_timestamp(chapter["start_time"])}
-                        readonly
-                        class="flex-1 text-sm border-gray-300 rounded-md bg-gray-50"
+                        phx-blur="update_timestamp"
+                        phx-target={@myself}
+                        phx-value-field="start_time"
+                        phx-value-chapter-id={chapter_id}
+                        class="flex-1 text-sm border-gray-300 rounded-md"
+                        placeholder="MM:SS"
                       />
                       <button
                         phx-click="set_time"
@@ -125,8 +129,12 @@ defmodule CivicusWeb.Components.ChapterEditor do
                       <input
                         type="text"
                         value={format_timestamp(chapter["end_time"])}
-                        readonly
-                        class="flex-1 text-sm border-gray-300 rounded-md bg-gray-50"
+                        phx-blur="update_timestamp"
+                        phx-target={@myself}
+                        phx-value-field="end_time"
+                        phx-value-chapter-id={chapter_id}
+                        class="flex-1 text-sm border-gray-300 rounded-md"
+                        placeholder="MM:SS"
                       />
                       <button
                         phx-click="set_time"
@@ -311,6 +319,40 @@ defmodule CivicusWeb.Components.ChapterEditor do
     end
   end
 
+  def handle_event(
+        "update_timestamp",
+        %{"chapter-id" => chapter_id, "field" => field, "value" => time_str},
+        socket
+      ) do
+    case parse_timestamp(time_str) do
+      {:ok, milliseconds} ->
+        updated_chapters =
+          Map.update!(socket.assigns.chapters, chapter_id, fn chapter ->
+            Map.put(chapter, field, milliseconds)
+          end)
+
+        case Civicus.Inquiries.update_inquiry(socket.assigns.inquiry, %{
+               chapters: updated_chapters
+             }) do
+          {:ok, updated_inquiry} ->
+            {:noreply,
+             socket
+             |> assign(:inquiry, updated_inquiry)
+             |> assign(:chapters, updated_chapters)}
+
+          {:error, _changeset} ->
+            {:noreply,
+             socket
+             |> put_flash(:error, "Error updating timestamp")}
+        end
+
+      :error ->
+        {:noreply,
+         socket
+         |> put_flash(:error, "Invalid time format. Please use MM:SS")}
+    end
+  end
+
   defp generate_chapter_id do
     :crypto.strong_rand_bytes(8) |> Base.encode16(case: :lower)
   end
@@ -324,4 +366,21 @@ defmodule CivicusWeb.Components.ChapterEditor do
   end
 
   defp format_timestamp(_), do: "00:00"
+
+  defp parse_timestamp(time_str) do
+    case String.split(time_str, ":") do
+      [minutes_str, seconds_str] ->
+        with {minutes, ""} <- Integer.parse(minutes_str),
+             {seconds, ""} <- Integer.parse(seconds_str),
+             true <- seconds >= 0 and seconds < 60,
+             true <- minutes >= 0 do
+          {:ok, (minutes * 60 + seconds) * 1000}
+        else
+          _ -> :error
+        end
+
+      _ ->
+        :error
+    end
+  end
 end

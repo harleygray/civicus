@@ -83,3 +83,6 @@ config :phoenix, :json_library, Jason
 import_config "#{config_env()}.exs"
 
 config :civicus, :deepgram_api_key, System.get_env("DEEPGRAM_API_KEY")
+
+config :civicus,
+  groq_api_key: System.get_env("GROQ_API_KEY")
