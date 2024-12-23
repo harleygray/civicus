@@ -1,18 +1,49 @@
-<body>
-  <.live_component module={HeaderNav} id="header_nav" />
+<div class="flex flex-col h-screen">
+  <.live_component module={HeaderNav} id="header_nav" class="w-full" />
 
-  <div class="padding-container">
-    <h2 class="heading-text">Inquiries</h2>
-    <p class="cta-text">
-      Here is my work-in-progress Senate Inquiries assistant.
+  <div class="flex flex-1 overflow-hidden">
+    <div class="flex-1 overflow-auto">
+      <div class="padding-container">
+        <h2 class="heading-text">Inquiries</h2>
+        <p class="cta-text">
+          Here is my work-in-progress Senate Inquiries assistant.
+          The goal is to help discover interesting information in the Senate's inquiries.
+        </p>
+      </div>
 
-      It's built to help us discover interesting information in the Senate's inquiries.
-    </p>
+      <div class="grid grid-cols-1 gap-4 p-4">
+        <%= for inquiry <- @inquiries do %>
+          <div
+            class="bg-white shadow rounded-lg p-4 cursor-pointer hover:shadow-lg transition-shadow"
+            phx-click="select_inquiry"
+            phx-value-id={inquiry.id}
+          >
+            <h3 class="text-lg font-semibold"><%= inquiry.name %></h3>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <%= if @selected_inquiry do %>
+      <div class="w-1/3 min-w-[400px] flex flex-col bg-gray-50 border-l">
+        <div class="p-4 flex-none">
+          <.live_component
+            module={VideoPlayer}
+            id="video_player"
+            inquiry={@selected_inquiry}
+            current_time={@current_time}
+          />
+        </div>
+
+        <.live_component
+          module={TranscriptView}
+          id="transcript_view"
+          inquiry={@selected_inquiry}
+          transcribing?={@transcribing?}
+          progress={@progress}
+          class="flex-1 overflow-auto"
+        />
+      </div>
+    <% end %>
   </div>
-
-  <.live_component
-    module={CivicusWeb.Components.VideoPlayer}
-    id="video_player"
-    inquiry={@selected_inquiry}
-  />
-</body>
+</div>

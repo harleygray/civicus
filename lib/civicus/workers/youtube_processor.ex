@@ -185,7 +185,7 @@ defmodule Civicus.Workers.YoutubeProcessor do
     utterances =
       case alternatives do
         %{"paragraphs" => %{"paragraphs" => paragraphs}} ->
-          # Flatten all sentences from all paragraphs
+          # Flatten all sentences from all paragraphs and add sentence numbers
           paragraphs
           |> Enum.flat_map(fn paragraph ->
             paragraph["sentences"]
@@ -206,18 +206,29 @@ defmodule Civicus.Workers.YoutubeProcessor do
               }
             end)
           end)
+          # Add index starting from 1
+          |> Enum.with_index(1)
+          |> Enum.map(fn {utterance, index} ->
+            Map.put(utterance, "sentence_number", "T#{index}")
+          end)
 
         _ ->
           # Fall back to original speaker-based chunking
           words = alternatives["words"] || []
 
-          Enum.chunk_by(words, & &1["speaker"])
+          words
+          |> Enum.chunk_by(& &1["speaker"])
           |> Enum.map(fn words ->
             %{
               "text" => Enum.map_join(words, " ", & &1["word"]),
               "start" => List.first(words)["start"] * 1000,
               "speaker" => "Speaker #{List.first(words)["speaker"]}"
             }
+          end)
+          # Add index starting from 1
+          |> Enum.with_index(1)
+          |> Enum.map(fn {utterance, index} ->
+            Map.put(utterance, "sentence_number", "T#{index}")
           end)
       end
 

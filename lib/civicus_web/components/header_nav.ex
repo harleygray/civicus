@@ -14,7 +14,7 @@ defmodule CivicusWeb.Components.HeaderNav do
         <div class="nav-links md:flex">
           <.link navigate="/" class="nav-link">Home</.link>
           <.link navigate="/articles" class="nav-link">Articles</.link>
-          <.link navigate="/inquiries" class="nav-link">Inquiries</.link>
+          <.link navigate="/inquiries" class="nav-link">Inquiries [WIP]</.link>
         </div>
       </div>
     </nav>

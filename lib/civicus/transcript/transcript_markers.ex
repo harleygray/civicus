@@ -66,12 +66,12 @@ defmodule Civicus.Transcript.TranscriptMarkers do
 
     @type t :: %__MODULE__{
             marker_type: MarkerType.t(),
-            start_time: float(),
+            sentence_number: String.t(),
             marker_information:
               Question.t() | Testimony.t() | OpeningStatement.t() | Procedure.t()
           }
 
-    defstruct [:marker_type, :start_time, :marker_information]
+    defstruct [:marker_type, :sentence_number, :marker_information]
   end
 
   @doc """
@@ -105,32 +105,32 @@ defmodule Civicus.Transcript.TranscriptMarkers do
       %{
         role: "system",
         content: """
-        You are an expert at analyzing parliamentary transcripts. Your task is to identify and classify different types of segments in the transcript.
+        You are an expert at analyzing Australian parliamentary transcripts. Your task is to identify and classify different types of segments in the transcript.
 
         You must respond with a JSON object in this exact format:
         {
           "transcript_markers": [
             {
               "marker_type": "QUESTION"|"OPENING_STATEMENT"|"PROCEDURE"|"TESTIMONY",
-              "start_time": <timestamp in milliseconds>,
+              "sentence_number": "The time marker where the transcript marker occurs. Must be 'T' followed by an integer.",
               "marker_information": {
-                // For QUESTION:
+                // For QUESTION: The start of an inquiry by a parliamentarian. Often these are phrased as questions, but not always. For example, 'Tell me more about the budget' is an inquiry about the budget.
                 "question": "text of the question",
                 "answer": "the answer if available",
                 "who_is_asking": "speaker name",
                 "who_is_being_asked": "target speaker"
 
-                // For TESTIMONY:
+                // For TESTIMONY: The start of testimony by a meeting attendee who is not a parliamentarian. Often there is an agency that testifies.
                 "speaker_name": "name",
                 "speaker_role": "role",
                 "speaker_organization": "org",
                 "testimony_title": "title"
 
-                // For OPENING_STATEMENT:
+                // For OPENING_STATEMENT: Opening statements by a parliamentarian. These are standalone statements or addresses by a parliamentarian opening a committee hearing.
                 "speaker_name": "name",
                 "opening_statement_title": "title"
 
-                // For PROCEDURE:
+                // For PROCEDURE: The start of a procedural portion of the meeting, for example the start of a meeting, a vote, a roll call, calling up testimony, etc. The start of the meeting, where parliamentarians ask people to silence their phones, should always be called "Front Matter".
                 "procedure_title": "title"
               }
             }
@@ -149,14 +149,17 @@ defmodule Civicus.Transcript.TranscriptMarkers do
 
   defp format_segments_for_llm(segments) do
     segments
-    |> Enum.map_join("\n", fn %{"speaker" => speaker, "start" => start, "text" => text} ->
-      "[SPEAKER: #{speaker}]\n[T#{trunc(start)}] #{text}"
+    |> Enum.map_join("\n\n", fn segment ->
+      speaker = Map.get(segment, "speaker")
+      text = Map.get(segment, "text")
+      sentence_number = Map.get(segment, "sentence_number")
+
+      "[#{speaker}]\n[#{sentence_number}] #{text}"
     end)
   end
 
   defp parse_llm_response(%{"choices" => [%{"message" => %{"content" => content}}]}) do
     require Logger
-    Logger.info("Raw LLM response content: #{content}")
 
     case Jason.decode(content) do
       {:ok, decoded} ->
@@ -187,7 +190,7 @@ defmodule Civicus.Transcript.TranscriptMarkers do
 
   defp convert_to_marker_struct(%{
          "marker_type" => type,
-         "start_time" => start_time,
+         "sentence_number" => sentence_number,
          "marker_information" => info
        }) do
     marker_type = String.downcase(type) |> String.to_existing_atom()
@@ -195,7 +198,7 @@ defmodule Civicus.Transcript.TranscriptMarkers do
 
     %TranscriptMarker{
       marker_type: marker_type,
-      start_time: start_time,
+      sentence_number: sentence_number,
       marker_information: marker_info
     }
   end
