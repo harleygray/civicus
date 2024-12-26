@@ -366,4 +366,11 @@ defmodule CivicusWeb.InquiryInterface.Edit do
         :error
     end
   end
+
+  # Add this handler for speaker mapping updates
+  @impl true
+  def handle_info({:speaker_mappings_updated, speaker_mappings}, socket) do
+    {:noreply,
+     assign(socket, inquiry: %{socket.assigns.inquiry | speaker_mappings: speaker_mappings})}
+  end
 end

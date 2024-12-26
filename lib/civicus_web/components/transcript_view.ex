@@ -2,6 +2,19 @@ defmodule CivicusWeb.Components.TranscriptView do
   use CivicusWeb, :live_component
   require Logger
 
+  @impl true
+  def update(%{inquiry: inquiry} = assigns, socket) do
+    if !Map.get(socket.assigns, :subscribed?) && connected?(socket) do
+      Phoenix.PubSub.subscribe(Civicus.PubSub, "speaker_mappings:#{inquiry.id}")
+    end
+
+    {:ok,
+     socket
+     |> assign(assigns)
+     |> assign(subscribed?: true)}
+  end
+
+  @impl true
   def render(assigns) do
     ~H"""
     <div class="transcript-container">
@@ -81,5 +94,13 @@ defmodule CivicusWeb.Components.TranscriptView do
   def handle_event("seek_video", %{"time" => time}, socket) do
     {time_int, _} = Integer.parse(time)
     {:noreply, push_event(socket, "seek_video", %{time: time_int})}
+  end
+
+  @impl true
+  def handle_info({:speaker_mappings_updated, speaker_mappings}, socket) do
+    Logger.debug("TranscriptView received speaker_mappings_updated")
+
+    {:noreply,
+     assign(socket, inquiry: %{socket.assigns.inquiry | speaker_mappings: speaker_mappings})}
   end
 end
